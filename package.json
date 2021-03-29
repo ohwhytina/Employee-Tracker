@@ -5,9 +5,6 @@
   "main": "app.js",
   "scripts": {
     "test": "jest",
-    "migrate": "sqlite3 db/employee.db < db/schema.sql",
-    "seed": "sqlite3 db/employee.db < db/seeds.sql",
-    "db": "sqlite3 db/employee.db",
     "start": "node app.js"
   },
   "repository": {
@@ -22,7 +19,11 @@
   },
   "homepage": "https://github.com/ohwhytina/Employee-Tracker#readme",
   "dependencies": {
+    "console.table": "^0.10.0",
     "express": "^4.17.1",
+    "inquirer": "^8.0.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
     "sqlite3": "^5.0.2"
   },
   "devDependencies": {
