@@ -1,13 +1,10 @@
-const mysql = require('mysql');
-const inputCheck = require('./utils/inputCheck');
+const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-// const PORT = process.env.PORT || 8019;
-
 
 const connection = mysql.createConnection({
     host: 'localhost',
-    port: 8019,
+    port: 3009,
     user: 'root',
     password: 'password',
     database: 'employee_db',
@@ -15,8 +12,9 @@ const connection = mysql.createConnection({
 
 // Establishing Connection to database
 connection.connect((err) => {
-    if (err) throw err
-
+    if (err) throw err;
+    console.log("Welcome to employee tracker!");
+    options();
 });
 
 
@@ -101,16 +99,76 @@ function viewEmployees() {
 // Add a department 
 function addDepartment() {
     inquirer
+        .prompt({
+            type: "input",
+            message: "Enter Department Name",
+            name: "department"
+        }).then(function(answer){
+            connection.query(
+                'INSERT INTO department SET ?',
+                {name: answer.department
+                },
+                function(err, answer) {
+                    if (err) {
+                        throw err;
+                    }
+                }
+            ),
+            console.table(answer);
+            options();
+        })
 }
 
 // Add a Role
 function addRole() {
-
+    var deptList = [];
+    connection.query('SELECT * FROM department', function (err, answer) {
+        for (i=0; i < answer.length; i++){
+            deptList.push(answer[i].name);
+        }
+    })
+    inquirer
+    .prompt([
+        {
+            type: "input",
+            message: "Enter Role Title",
+            name: "addTitle"
+        },
+        {
+            type: "input",
+            message: "Select Department ID",
+            name: "deptId",
+            choices: deptList
+        },
+        {
+            type: "input",
+            message:"Enter Role Salary",
+            name: "addSalary"
+        }
+    ]).then(function(answer){
+        connection.query('INSERT INTO role SET ?',
+            {
+                title: answer.addTitle,
+                department_id: answer.deptId,
+                salary: answer.addSalary
+            },
+            function(err, answer){
+                if (err) {
+                    throw err;
+                }
+            })
+            options();
+    })
 }
 
 // Add an Employee
 function addEmployee() {
-    
+    inquirer
+    .prompt([
+        {
+            
+        }
+    ])
 }
 
 // Update an Employee Role
