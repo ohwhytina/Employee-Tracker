@@ -1,24 +1,24 @@
-const sqlite3 = require('sqlite3').verbose();
-const express = require('express');
+const mysql = require('mysql');
 const inputCheck = require('./utils/inputCheck');
 const inquirer = require('inquirer');
-
-const PORT = process.env.PORT || 5000;
-const app = express();
-
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const cTable = require('console.table');
+// const PORT = process.env.PORT || 8019;
 
 
-// Connect to database
-const db = new sqlite3.Database('./db/employee.db', err => {
-    if (err) {
-        return console.error(err.message);
-    }
-
-    console.log('Connected to the employee database');
+const connection = mysql.createConnection({
+    host: 'localhost',
+    port: 8019,
+    user: 'root',
+    password: 'password',
+    database: 'employee_db',
 });
+
+// Establishing Connection to database
+connection.connect((err) => {
+    if (err) throw err
+
+});
+
 
 function options() {
     inquirer 
@@ -36,8 +36,7 @@ function options() {
                 'Update an Employee role',
                 'Quit'
             ]
-        })
-        .then(function (answer) {
+        }).then(function (answer) {
             switch (answer.action){
                 case 'View All Departments':
                     viewDepartments();
@@ -71,24 +70,37 @@ function options() {
 
 // Get all departments 
 function viewDepartments() {
-    var list = 'SELECT * FROM departments';
-
-}
+    connection.query(
+        'SELECT * FROM department',
+        function (err, answer) {
+        console.table(answer);
+    });
+    options();
+};
 
 // Get all rolles 
 function viewRoles() {
-    var list = 'SELECT * FROM roles';
+    connection.query(
+        'SELECT * FROM roles',
+        function (err, answer) {
+        console.table(answer);
+    });
+    options();
+};
 
-}
 // Get all rolles 
 function viewEmployees() {
-    var list = 'SELECT * FROM employee';
-
+    connection.query(
+        'SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name AS department, roles.salary FROM employee LEFT JOIN roles ON employee.roles_id = roles.id LEFT JOIN department on roles.department_id = department.id',
+        function (err, answer) {
+        console.table(answer);
+    });
+    options();
 }
 
 // Add a department 
 function addDepartment() {
-    
+    inquirer
 }
 
 // Add a Role
@@ -108,20 +120,8 @@ function updateEmployee() {
 
 // quit app
 function quitApp() {
-    
+    console.log("Thank you for using Employee Tracker!");
+    connection.end();
 }
 
-
-
-// Default response for any other request(Not Found) Catch all
-app.use((req, res) => {
-    res.status(404).end();
-  });
-
-  // Start server after DB connection 
-  db.on('open', () => {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-        options();
-  });
-});
+options();
