@@ -1,6 +1,6 @@
 USE employee_db;
 
-INSERT INTO department (name, id)
+INSERT INTO department (namee, id)
 VALUES 
 ('IT', 1),
 ('Sales', 2),
